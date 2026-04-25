@@ -1,1 +1,2 @@
-# xxz
+# xxzcd /workspace/xxz
+npm start
