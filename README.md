@@ -1,1 +1,5 @@
-python3 -m http.server 3000
+# 项目启动方式
+
+```bash
+cd /workspace/xxz
+npm start
