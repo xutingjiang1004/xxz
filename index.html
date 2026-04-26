@@ -1,30 +1,214 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <title>我的第一个互联网站</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>互联朋友圈</title>
   <style>
-    body { font-family: 微软雅黑; text-align: center; padding-top: 100px; }
-    h1 { color: #2c3e50; }
-    .success { color: #27ae60; font-size: 20px; margin-top: 30px; }
-    .error { color: #e74c3c; font-size: 20px; margin-top: 30px; }
+    :root { --bg:#eef2ff; --card:#fff; --line:#e5e7eb; --brand:#6366f1; --text:#111827; --sub:#6b7280; }
+    *{box-sizing:border-box} body{margin:0;font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:linear-gradient(180deg,#e0e7ff,#f8fafc);color:var(--text)}
+    .wrap{max-width:1100px;margin:0 auto;padding:18px}
+    .top{position:sticky;top:12px;z-index:3;background:rgba(255,255,255,.85);backdrop-filter:blur(8px);border:1px solid #fff;border-radius:16px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 10px 25px rgba(99,102,241,.16);animation:in .35s ease}
+    .title{font-size:22px;font-weight:700}.sub{font-size:13px;color:var(--sub)}
+    .btn{border:0;padding:9px 13px;border-radius:10px;cursor:pointer;font-weight:600;transition:all .2s ease}.btn:hover{transform:translateY(-1px)}.btn:active{transform:translateY(1px)}
+    .p{background:var(--brand);color:#fff}.s{background:#eef2ff;color:#3730a3}.g{background:#f3f4f6;color:#111827}
+    .menu{position:relative}.dropdown{display:none;position:absolute;right:0;top:calc(100% + 8px);width:220px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;box-shadow:0 8px 24px rgba(17,24,39,.14);animation:pop .18s ease}.dropdown.open{display:block}
+    .layout{display:grid;gap:14px;grid-template-columns:1fr 320px;margin-top:14px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;box-shadow:0 8px 20px rgba(17,24,39,.06)}
+    .feed{display:grid;gap:12px}.post{border:1px solid #edf0f5;border-radius:14px;padding:12px;transition:.2s}.post:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,.08)}
+    .meta{font-size:12px;color:var(--sub)} .tag{font-size:12px;background:#eef2ff;color:#4338ca;padding:2px 8px;border-radius:99px}
+    .topline{display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .media{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:8px;margin-top:8px}
+    .media img,.media video{width:100%;height:170px;object-fit:cover;border-radius:10px;border:1px solid #e5e7eb;background:#f3f4f6}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.small{font-size:12px;color:var(--sub)}
+    input,textarea,select{width:100%;border:1px solid #d1d5db;border-radius:10px;padding:9px;font:inherit} textarea{min-height:88px;resize:vertical}
+    .stack{display:grid;gap:8px}
+    .toast{position:fixed;right:18px;bottom:18px;background:#111827;color:#fff;padding:10px 12px;border-radius:10px;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none}.toast.on{opacity:1;transform:none}
+    @keyframes in {from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+    @keyframes pop {from{opacity:.4;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
+    @media(max-width:930px){.layout{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-  <h1>🌐 我的互联网站测试页</h1>
-  <div id="result">正在连接后端...</div>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="title">📱 互联朋友圈</div>
+      <div class="sub">发布入口在二次菜单；游客可评论与点赞；支持原图/原视频上传下载</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button id="loginBtn" class="btn p">登录发布</button>
+      <div class="menu">
+        <button id="menuBtn" class="btn s">二次菜单 ☰</button>
+        <div id="menu" class="dropdown">
+          <button id="togglePublish" class="btn g" style="width:100%;margin-bottom:6px;text-align:left">✍️ 发布入口</button>
+          <button id="jumpHistory" class="btn g" style="width:100%;text-align:left">🕘 浏览记录</button>
+        </div>
+      </div>
+    </div>
+  </header>
 
-  <script>
-    fetch('/api/hello')
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById('result').className = 'success';
-        document.getElementById('result').innerText = data.message;
-      })
-      .catch(err => {
-        document.getElementById('result').className = 'error';
-        document.getElementById('result').innerText = "❌ 后端连接失败，请检查服务是否启动";
-      });
-  </script>
+  <div class="layout">
+    <section class="card">
+      <div style="font-weight:700;margin-bottom:8px">动态广场（实时互联）</div>
+      <div id="feed" class="feed"></div>
+    </section>
+
+    <aside class="card">
+      <div style="font-weight:700">发布区（默认隐藏）</div>
+      <form id="publishForm" style="display:none;margin-top:8px" class="stack">
+        <select name="type"><option value="moment">朋友圈</option><option value="diary">日记</option></select>
+        <input name="title" placeholder="标题（可空）" />
+        <textarea name="content" placeholder="说点什么…"></textarea>
+        <input type="file" name="media" multiple accept="image/*,video/*" />
+        <button class="btn p" type="submit">发布动态</button>
+      </form>
+
+      <div style="font-weight:700;margin-top:14px">公共统计</div>
+      <div id="stats" class="small">加载中…</div>
+
+      <div style="font-weight:700;margin-top:14px">我的浏览记录</div>
+      <div id="history" class="small">暂无</div>
+    </aside>
+  </div>
+</div>
+<div id="toast" class="toast"></div>
+<script>
+  const state = {
+    token: localStorage.getItem('token') || '',
+    username: localStorage.getItem('username') || '',
+    visitorId: localStorage.getItem('visitorId') || crypto.randomUUID(),
+    posts: [],
+    history: JSON.parse(localStorage.getItem('history') || '[]')
+  };
+  localStorage.setItem('visitorId', state.visitorId);
+
+  const $feed = document.getElementById('feed');
+  const $stats = document.getElementById('stats');
+  const $history = document.getElementById('history');
+
+  function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800)}
+  function fmt(t){return new Date(t).toLocaleString('zh-CN',{hour12:false})}
+
+  function renderSide(){
+    const views = state.posts.reduce((n,p)=>n+p.viewCount,0);
+    const likes = state.posts.reduce((n,p)=>n+p.likes,0);
+    const comments = state.posts.reduce((n,p)=>n+p.comments.length,0);
+    $stats.innerHTML = `总浏览：${views} 次<br>总点赞：${likes} 次<br>总评论：${comments} 条`;
+    if(!state.history.length){$history.textContent='暂无';return;}
+    $history.innerHTML = state.history.slice(-10).reverse().map(i=>`• ${i.title}（${fmt(i.at)}）`).join('<br>');
+  }
+
+  function mediaHtml(list){
+    return list.map(m=>`<div>${m.kind==='video'?`<video controls src="${m.url}"></video>`:`<img src="${m.url}" alt="${m.originalName}">`}<div class="small">原画下载：<a href="${m.downloadUrl}" target="_blank">${m.originalName}</a></div></div>`).join('');
+  }
+
+  function postHtml(p){
+    const comments = p.comments.slice(-3).map(c=>`<div class="small">${c.nickname}：${c.content}</div>`).join('') || '<div class="small">暂无评论</div>';
+    const views = (p.views || []).map(v=>v.name).join('、') || '暂无';
+    return `<article class="post" data-id="${p.id}"><div class="topline"><strong>${p.title}</strong><span class="tag">${p.type==='diary'?'日记':'朋友圈'}</span></div><div class="meta">@${p.author} · ${fmt(p.createdAt)}</div><p>${p.content}</p>${p.media.length?`<div class="media">${mediaHtml(p.media)}</div>`:''}<div class="actions"><button class="btn g" data-a="view">👁 浏览（${p.viewCount}）</button><button class="btn g" data-a="like">👍 点赞（${p.likes}）</button><button class="btn g" data-a="comment">💬 评论</button></div><div class="small">最近浏览：${views}</div><div style="margin-top:6px">${comments}</div></article>`;
+  }
+
+  function renderFeed(){
+    $feed.innerHTML = state.posts.map(postHtml).join('') || '<div class="small">还没有动态，快发布第一条吧。</div>';
+    renderSide();
+  }
+
+  async function loadPosts(){
+    const r = await fetch('/api/posts');
+    state.posts = await r.json();
+    renderFeed();
+  }
+
+  async function login(){
+    const username = prompt('输入登录昵称（仅发布需要登录）', state.username || '');
+    if(!username) return;
+    const r = await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username})});
+    const d = await r.json();
+    if(!r.ok) return toast(d.message || '登录失败');
+    state.token = d.token;
+    state.username = d.user.username;
+    localStorage.setItem('token', state.token);
+    localStorage.setItem('username', state.username);
+    document.getElementById('loginBtn').textContent = `已登录：${state.username}`;
+    toast('登录成功，可发布动态');
+  }
+
+  async function publish(e){
+    e.preventDefault();
+    if(!state.token) return toast('请先登录');
+    const fd = new FormData(e.target);
+    const r = await fetch('/api/posts',{method:'POST',headers:{Authorization:`Bearer ${state.token}`},body:fd});
+    const d = await r.json();
+    if(!r.ok) return toast(d.message || '发布失败');
+    e.target.reset();
+    toast('发布成功，已实时同步');
+    await loadPosts();
+  }
+
+  async function viewPost(id){
+    const r = await fetch(`/api/posts/${id}?name=${encodeURIComponent(state.username || '游客')}`,{headers:{'x-visitor-id':state.visitorId}});
+    const d = await r.json();
+    if(!r.ok) return toast(d.message || '浏览失败');
+    const ix = state.posts.findIndex(p=>p.id===id); if(ix>=0) state.posts[ix]=d;
+    state.history.push({id,title:d.title,at:new Date().toISOString()});
+    localStorage.setItem('history', JSON.stringify(state.history.slice(-40)));
+    renderFeed();
+  }
+
+  async function likePost(id){
+    const r = await fetch(`/api/posts/${id}/likes`,{method:'POST',headers:{'x-visitor-id':state.visitorId}});
+    const d = await r.json();
+    if(!r.ok) return toast(d.message || '点赞失败');
+    const p = state.posts.find(i=>i.id===id); if(p) p.likes = d.likes;
+    renderFeed();
+  }
+
+  async function commentPost(id){
+    const content = prompt('评论内容：'); if(!content) return;
+    const nickname = prompt('昵称（可空）', state.username || '') || '游客';
+    const r = await fetch(`/api/posts/${id}/comments`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nickname,content})});
+    const d = await r.json();
+    if(!r.ok) return toast(d.message || '评论失败');
+    const p = state.posts.find(i=>i.id===id); if(p) p.comments.push(d);
+    renderFeed();
+    toast('评论成功，对方可看到更新');
+  }
+
+  function initRealtime(){
+    const es = new EventSource('/api/stream');
+    ['post','comment','like','view'].forEach(ev => es.addEventListener(ev, () => loadPosts()));
+    es.onerror = () => toast('实时连接波动，系统会自动重连');
+  }
+
+  document.getElementById('loginBtn').addEventListener('click', login);
+  document.getElementById('publishForm').addEventListener('submit', publish);
+  document.getElementById('menuBtn').addEventListener('click', ()=>document.getElementById('menu').classList.toggle('open'));
+  document.getElementById('togglePublish').addEventListener('click', ()=>{
+    const f = document.getElementById('publishForm');
+    f.style.display = f.style.display === 'none' ? 'grid' : 'none';
+    document.getElementById('menu').classList.remove('open');
+  });
+  document.getElementById('jumpHistory').addEventListener('click', ()=>{
+    document.getElementById('history').scrollIntoView({behavior:'smooth', block:'center'});
+    document.getElementById('menu').classList.remove('open');
+  });
+  document.addEventListener('click', e=>{if(!e.target.closest('.menu')) document.getElementById('menu').classList.remove('open');});
+
+  $feed.addEventListener('click', async (e)=>{
+    const btn = e.target.closest('button[data-a]'); if(!btn) return;
+    const post = e.target.closest('.post'); if(!post) return;
+    const id = post.dataset.id;
+    if(btn.dataset.a === 'view') await viewPost(id);
+    if(btn.dataset.a === 'like') await likePost(id);
+    if(btn.dataset.a === 'comment') await commentPost(id);
+  });
+
+  (async () => {
+    if(state.username) document.getElementById('loginBtn').textContent = `已登录：${state.username}`;
+    await loadPosts();
+    initRealtime();
+  })();
+</script>
 </body>
 </html>
