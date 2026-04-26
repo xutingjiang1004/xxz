@@ -1,18 +1,22 @@
 const express = require('express');
+const path = require('path');
 const app = express();
-const port = 3000;
 
-// 关键配置：监听0.0.0.0，支持手机局域网访问
-app.listen(port, '0.0.0.0', () => {
-  console.log('✅ 服务启动成功！');
-  console.log('💻 电脑本地访问：http://localhost:' + port);
-  console.log('📱 手机局域网访问：http://[你的电脑IP]:' + port);
+// 关键修复1：适配Render线上端口，本地默认3000
+const port = process.env.PORT || 3000;
+
+// 关键修复2：用绝对路径定位public文件夹，线上线下都能精准找到文件
+const publicPath = path.join(__dirname, 'public');
+app.use(express.static(publicPath));
+
+// 首页路由，兜底确保能找到index.html
+app.get('/', (req, res) => {
+  res.sendFile(path.join(publicPath, 'index.html'));
 });
 
-// 让页面能正常访问
-app.use(express.static('public'));
-
-// 首页路由
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/public/index.html');
+// 监听所有网卡，适配所有环境
+app.listen(port, '0.0.0.0', () => {
+  console.log('✅ 服务启动成功！');
+  console.log('💻 本地访问：http://localhost:' + port);
+  console.log('🌐 线上访问：https://xxz-ij5l.onrender.com');
 });
