@@ -223,13 +223,23 @@
 
     // ==================== WebSocket ====================
     function connectWebSocket() {
-      const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-      state.ws = new WebSocket(`${protocol}//${location.host}`);
-      state.ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        handleWebSocketMessage(data);
-      };
-      state.ws.onclose = () => setTimeout(connectWebSocket, 3000);
+      try {
+        const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+        state.ws = new WebSocket(`${protocol}//${location.host}`);
+        state.ws.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          handleWebSocketMessage(data);
+        };
+        state.ws.onerror = (error) => {
+          console.log('WebSocket 连接失败（服务可能未启动）', error);
+        };
+        state.ws.onclose = () => {
+          setTimeout(connectWebSocket, 5000);
+        };
+      } catch (e) {
+        console.log('WebSocket 连接出错', e);
+        setTimeout(connectWebSocket, 5000);
+      }
     }
 
     function handleWebSocketMessage(msg) {
