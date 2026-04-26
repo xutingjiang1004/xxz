@@ -37,6 +37,9 @@
       padding: 18px 20px;
       text-align: center;
       box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .glass-nav h1 {
@@ -63,6 +66,32 @@
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 二次菜单按钮（发布入口） */
+    .menu-btn {
+      background: linear-gradient(90deg, #6366f1, #8b5cf6);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 10px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    .menu-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+    }
+
+    /* 发布面板（默认隐藏） */
+    .publish-panel {
+      display: none;
+    }
+
+    .publish-panel.show {
+      display: block;
     }
 
     /* 输入框 */
@@ -141,6 +170,32 @@
       font-size: 15px;
     }
 
+    /* 媒体（图片/视频） */
+    .post-media {
+      max-width: 100%;
+      border-radius: 12px;
+      margin: 10px 0;
+    }
+
+    /* 下载按钮 */
+    .download-btn {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      padding: 8px 16px;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .download-btn:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
     /* 交互栏 */
     .action-bar {
       display: flex;
@@ -202,6 +257,36 @@
       transform: translateX(-50%) translateY(0);
     }
 
+    /* 登录模态框 */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 20px;
+      padding: 30px;
+      width: 90%;
+      max-width: 400px;
+      color: #fff;
+    }
+
+    .modal h2 {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
     /* 空状态 */
     .empty {
       text-align: center;
@@ -213,16 +298,27 @@
 </head>
 
 <body>
+  <!-- 登录模态框（默认显示） -->
+  <div class="modal" id="loginModal">
+    <div class="modal-content">
+      <h2>欢迎来到小圈子</h2>
+      <input class="glass-input" id="loginNickname" placeholder="请输入昵称">
+      <button class="glass-btn" style="width:100%;margin-top:10px" onclick="handleLogin()">进入</button>
+    </div>
+  </div>
+
   <!-- 顶部导航 -->
   <div class="glass-nav">
     <h1>✨ 液态玻璃小圈子</h1>
+    <button class="menu-btn" onclick="togglePublishPanel()">发布动态</button>
   </div>
 
-  <!-- 发布面板 -->
-  <div class="glass-card clearfix">
-    <input class="glass-input" id="nickname" placeholder="你的昵称">
+  <!-- 发布面板（默认隐藏） -->
+  <div class="glass-card publish-panel clearfix" id="publishPanel">
+    <input class="glass-input" id="publishNickname" placeholder="昵称（登录用户自动填充）">
     <textarea class="glass-input" id="content" rows="3" placeholder="分享你的动态..."></textarea>
-    <button class="glass-btn" onclick="publishPost()">发布动态</button>
+    <input type="file" class="glass-input" id="mediaUpload" accept="image/*,video/*" placeholder="上传图片/视频">
+    <button class="glass-btn" onclick="publishPost()">发布</button>
   </div>
 
   <!-- 动态列表 -->
@@ -233,10 +329,22 @@
 
   <script>
     // 全局变量
+    let userInfo = null;
     let toastTimer = null;
+    let eventSource = null;
 
     // 页面加载
-    window.onload = () => { loadPosts() };
+    window.onload = () => {
+      // 检查是否已登录
+      const savedUser = localStorage.getItem('userInfo');
+      if (savedUser) {
+        userInfo = JSON.parse(savedUser);
+        document.getElementById('loginModal').style.display = 'none';
+        document.getElementById('publishNickname').value = userInfo.nickname;
+      }
+      loadPosts();
+      initSSE();
+    };
 
     // Toast提示（替代alert）
     function showToast(msg) {
@@ -249,13 +357,46 @@
       }, 2000);
     }
 
+    // 登录处理
+    async function handleLogin() {
+      const nickname = document.getElementById('loginNickname').value.trim();
+      if (!nickname) return showToast('请输入昵称');
+
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nickname })
+      });
+      const data = await res.json();
+      if (data.code === 200) {
+        userInfo = data.data;
+        localStorage.setItem('userInfo', JSON.stringify(userInfo));
+        document.getElementById('loginModal').style.display = 'none';
+        document.getElementById('publishNickname').value = nickname;
+        showToast('登录成功 ✅');
+      }
+    }
+
+    // 切换发布面板显示/隐藏（二次菜单）
+    function togglePublishPanel() {
+      if (!userInfo) {
+        showToast('请先登录后再发布');
+        return;
+      }
+      const panel = document.getElementById('publishPanel');
+      panel.classList.toggle('show');
+    }
+
     // 加载动态
     async function loadPosts() {
       try {
         const res = await fetch('/api/posts');
         const data = await res.json();
         renderPosts(data.data || []);
-      } catch (e) { showToast('加载失败'); }
+      } catch (e) { 
+        console.error('加载失败', e);
+        showToast('加载失败');
+      }
     }
 
     // 渲染动态
@@ -269,13 +410,28 @@
       let html = '';
       posts.forEach(p => {
         const time = new Date(p.createTime).toLocaleString();
+        let mediaHtml = '';
+        let downloadBtn = '';
+
+        // 渲染图片/视频
+        if (p.media) {
+          if (p.media.type.startsWith('image')) {
+            mediaHtml = `<img src="${p.media.data}" class="post-media" alt="${p.media.name}">`;
+          } else if (p.media.type.startsWith('video')) {
+            mediaHtml = `<video src="${p.media.data}" class="post-media" controls alt="${p.media.name}"></video>`;
+          }
+          // 下载按钮
+          downloadBtn = `<button class="download-btn" onclick="downloadMedia('${p.media.data}', '${p.media.name}')">⬇️ 下载原文件</button>`;
+        }
+
+        // 渲染评论
         let comments = '';
         p.comments.forEach(c => {
           comments += `<div class="comment-item"><span class="comment-name">${c.nickname}</span>：${c.content}</div>`;
         });
 
         html += `
-        <div class="glass-card post-card">
+        <div class="glass-card post-card" id="post-${p.id}">
           <div class="post-user">
             <div class="avatar">${p.nickname.charAt(0) || '匿'}</div>
             <div>
@@ -284,9 +440,11 @@
             </div>
           </div>
           <div class="post-content">${p.content}</div>
+          ${mediaHtml}
+          ${downloadBtn}
           <div class="action-bar">
-            <div class="action" onclick="like(${p.id})">👍 ${p.like}</div>
-            <div class="action" onclick="view(${p.id})">👀 ${p.view}</div>
+            <div class="action" onclick="like(${p.id})">👍 ${p.likeCount}</div>
+            <div class="action" onclick="view(${p.id})">👀 ${p.viewCount}</div>
             <div class="action">💬 ${p.comments.length}</div>
           </div>
           <div style="margin-top:12px">${comments}</div>
@@ -300,26 +458,55 @@
       list.innerHTML = html;
     }
 
-    // 发布动态
-    async function publishPost() {
-      const nickname = document.getElementById('nickname').value.trim();
-      const content = document.getElementById('content').value.trim();
-      if (!content) return showToast('请输入内容');
+    // 下载媒体文件
+    function downloadMedia(data, filename) {
+      const link = document.createElement('a');
+      link.href = data;
+      link.download = filename;
+      link.click();
+      showToast('开始下载...');
+    }
 
-      await fetch('/api/posts', {
+    // 发布动态（带文件上传）
+    async function publishPost() {
+      if (!userInfo) return showToast('请先登录');
+
+      const nickname = document.getElementById('publishNickname').value.trim();
+      const content = document.getElementById('content').value.trim();
+      const mediaFile = document.getElementById('mediaUpload').files[0];
+
+      const formData = new FormData();
+      formData.append('nickname', nickname || userInfo.nickname);
+      formData.append('content', content);
+      formData.append('token', userInfo.token);
+      if (mediaFile) {
+        formData.append('media', mediaFile);
+      }
+
+      const res = await fetch('/api/posts', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nickname, content })
+        body: formData
       });
-      showToast('发布成功 ✅');
-      document.getElementById('content').value = '';
-      loadPosts();
+      const data = await res.json();
+      if (data.code === 200) {
+        showToast('发布成功 ✅');
+        document.getElementById('content').value = '';
+        document.getElementById('mediaUpload').value = '';
+        document.getElementById('publishPanel').classList.remove('show');
+      } else {
+        showToast(data.msg || '发布失败');
+      }
     }
 
     // 点赞
     async function like(id) {
-      await fetch(`/api/posts/${id}/like`, { method: 'POST' });
-      loadPosts();
+      const res = await fetch(`/api/posts/${id}/like`, { method: 'POST' });
+      const data = await res.json();
+      if (data.code === 200) {
+        showToast('点赞成功');
+      } else {
+        showToast(data.msg || '点赞失败');
+      }
     }
 
     // 浏览量
@@ -327,19 +514,44 @@
       await fetch(`/api/posts/${id}/view`, { method: 'POST' });
     }
 
-    // 评论
+    // 评论（游客无需登录）
     async function comment(id) {
       const nick = document.getElementById(`c_nick_${id}`).value.trim();
       const text = document.getElementById(`c_text_${id}`).value.trim();
       if (!text) return showToast('请输入评论');
 
-      await fetch(`/api/posts/${id}/comment`, {
+      const res = await fetch(`/api/posts/${id}/comment`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nickname: nick, content: text })
       });
-      showToast('评论成功');
-      loadPosts();
+      const data = await res.json();
+      if (data.code === 200) {
+        showToast('评论成功');
+        document.getElementById(`c_text_${id}`).value = '';
+      } else {
+        showToast(data.msg || '评论失败');
+      }
+    }
+
+    // 初始化SSE实时更新
+    function initSSE() {
+      eventSource = new EventSource('/api/events');
+      eventSource.onmessage = (event) => {
+        const { type, data } = JSON.parse(event.data);
+        // 收到更新后重新加载动态
+        loadPosts();
+        // 显示提示
+        if (type === 'newPost') {
+          showToast('有新动态发布啦！');
+        } else if (type === 'newComment') {
+          showToast('收到新评论！');
+        }
+      };
+      eventSource.onerror = () => {
+        console.error('SSE连接失败，3秒后重试');
+        setTimeout(initSSE, 3000);
+      };
     }
   </script>
 </body>
