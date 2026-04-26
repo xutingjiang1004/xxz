@@ -1,214 +1,357 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>互联朋友圈</title>
   <style>
-    :root { --bg:#eef2ff; --card:#fff; --line:#e5e7eb; --brand:#6366f1; --text:#111827; --sub:#6b7280; }
-    *{box-sizing:border-box} body{margin:0;font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:linear-gradient(180deg,#e0e7ff,#f8fafc);color:var(--text)}
-    .wrap{max-width:1100px;margin:0 auto;padding:18px}
-    .top{position:sticky;top:12px;z-index:3;background:rgba(255,255,255,.85);backdrop-filter:blur(8px);border:1px solid #fff;border-radius:16px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 10px 25px rgba(99,102,241,.16);animation:in .35s ease}
-    .title{font-size:22px;font-weight:700}.sub{font-size:13px;color:var(--sub)}
-    .btn{border:0;padding:9px 13px;border-radius:10px;cursor:pointer;font-weight:600;transition:all .2s ease}.btn:hover{transform:translateY(-1px)}.btn:active{transform:translateY(1px)}
-    .p{background:var(--brand);color:#fff}.s{background:#eef2ff;color:#3730a3}.g{background:#f3f4f6;color:#111827}
-    .menu{position:relative}.dropdown{display:none;position:absolute;right:0;top:calc(100% + 8px);width:220px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;box-shadow:0 8px 24px rgba(17,24,39,.14);animation:pop .18s ease}.dropdown.open{display:block}
-    .layout{display:grid;gap:14px;grid-template-columns:1fr 320px;margin-top:14px}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;box-shadow:0 8px 20px rgba(17,24,39,.06)}
-    .feed{display:grid;gap:12px}.post{border:1px solid #edf0f5;border-radius:14px;padding:12px;transition:.2s}.post:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,.08)}
-    .meta{font-size:12px;color:var(--sub)} .tag{font-size:12px;background:#eef2ff;color:#4338ca;padding:2px 8px;border-radius:99px}
-    .topline{display:flex;align-items:center;justify-content:space-between;gap:8px}
-    .media{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:8px;margin-top:8px}
-    .media img,.media video{width:100%;height:170px;object-fit:cover;border-radius:10px;border:1px solid #e5e7eb;background:#f3f4f6}
-    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.small{font-size:12px;color:var(--sub)}
-    input,textarea,select{width:100%;border:1px solid #d1d5db;border-radius:10px;padding:9px;font:inherit} textarea{min-height:88px;resize:vertical}
-    .stack{display:grid;gap:8px}
-    .toast{position:fixed;right:18px;bottom:18px;background:#111827;color:#fff;padding:10px 12px;border-radius:10px;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none}.toast.on{opacity:1;transform:none}
-    @keyframes in {from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
-    @keyframes pop {from{opacity:.4;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
-    @media(max-width:930px){.layout{grid-template-columns:1fr}}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "微软雅黑", sans-serif;
+    }
+    body {
+      background-color: #f5f5f5;
+      padding-bottom: 80px;
+    }
+    .header {
+      background-color: #fff;
+      padding: 16px 20px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header h1 {
+      font-size: 20px;
+      color: #333;
+    }
+    .publish-card {
+      background-color: #fff;
+      margin: 16px;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .publish-card input,
+    .publish-card textarea {
+      width: 100%;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+      font-size: 14px;
+      outline: none;
+      resize: none;
+    }
+    .publish-card textarea {
+      min-height: 80px;
+    }
+    .publish-btn {
+      background-color: #007aff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 24px;
+      font-size: 14px;
+      cursor: pointer;
+      float: right;
+    }
+    .post-list {
+      margin-top: 16px;
+    }
+    .post-card {
+      background-color: #fff;
+      margin: 0 16px 16px;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .post-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #007aff;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      margin-right: 12px;
+    }
+    .nickname {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+    .post-time {
+      font-size: 12px;
+      color: #999;
+      margin-top: 2px;
+    }
+    .post-content {
+      font-size: 15px;
+      color: #333;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .post-stats {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 12px 0;
+      border-top: 1px solid #f5f5f5;
+      border-bottom: 1px solid #f5f5f5;
+      font-size: 13px;
+      color: #666;
+    }
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+    .stat-item:hover {
+      color: #007aff;
+    }
+    .comment-section {
+      margin-top: 12px;
+    }
+    .comment-input-box {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .comment-input {
+      flex: 1;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+      outline: none;
+    }
+    .comment-btn {
+      background-color: #007aff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0 16px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .comment-list {
+      margin-top: 12px;
+    }
+    .comment-item {
+      padding: 8px 0;
+      border-bottom: 1px solid #fafafa;
+    }
+    .comment-nickname {
+      font-size: 13px;
+      font-weight: 600;
+      color: #007aff;
+    }
+    .comment-content {
+      font-size: 13px;
+      color: #333;
+      margin-top: 4px;
+    }
+    .clearfix::after {
+      content: "";
+      clear: both;
+      display: table;
+    }
   </style>
 </head>
 <body>
-<div class="wrap">
-  <header class="top">
-    <div>
-      <div class="title">📱 互联朋友圈</div>
-      <div class="sub">发布入口在二次菜单；游客可评论与点赞；支持原图/原视频上传下载</div>
-    </div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <button id="loginBtn" class="btn p">登录发布</button>
-      <div class="menu">
-        <button id="menuBtn" class="btn s">二次菜单 ☰</button>
-        <div id="menu" class="dropdown">
-          <button id="togglePublish" class="btn g" style="width:100%;margin-bottom:6px;text-align:left">✍️ 发布入口</button>
-          <button id="jumpHistory" class="btn g" style="width:100%;text-align:left">🕘 浏览记录</button>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <div class="layout">
-    <section class="card">
-      <div style="font-weight:700;margin-bottom:8px">动态广场（实时互联）</div>
-      <div id="feed" class="feed"></div>
-    </section>
-
-    <aside class="card">
-      <div style="font-weight:700">发布区（默认隐藏）</div>
-      <form id="publishForm" style="display:none;margin-top:8px" class="stack">
-        <select name="type"><option value="moment">朋友圈</option><option value="diary">日记</option></select>
-        <input name="title" placeholder="标题（可空）" />
-        <textarea name="content" placeholder="说点什么…"></textarea>
-        <input type="file" name="media" multiple accept="image/*,video/*" />
-        <button class="btn p" type="submit">发布动态</button>
-      </form>
-
-      <div style="font-weight:700;margin-top:14px">公共统计</div>
-      <div id="stats" class="small">加载中…</div>
-
-      <div style="font-weight:700;margin-top:14px">我的浏览记录</div>
-      <div id="history" class="small">暂无</div>
-    </aside>
+  <div class="header">
+    <h1>互联朋友圈</h1>
   </div>
-</div>
-<div id="toast" class="toast"></div>
-<script>
-  const state = {
-    token: localStorage.getItem('token') || '',
-    username: localStorage.getItem('username') || '',
-    visitorId: localStorage.getItem('visitorId') || crypto.randomUUID(),
-    posts: [],
-    history: JSON.parse(localStorage.getItem('history') || '[]')
-  };
-  localStorage.setItem('visitorId', state.visitorId);
 
-  const $feed = document.getElementById('feed');
-  const $stats = document.getElementById('stats');
-  const $history = document.getElementById('history');
+  <div class="publish-card clearfix">
+    <input type="text" id="nickname" placeholder="你的昵称（选填，默认匿名）">
+    <textarea id="postContent" placeholder="分享你的动态..."></textarea>
+    <button class="publish-btn" onclick="publishPost()">发布动态</button>
+  </div>
 
-  function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800)}
-  function fmt(t){return new Date(t).toLocaleString('zh-CN',{hour12:false})}
+  <div class="post-list" id="postList">
+    <!-- 动态列表会在这里自动渲染 -->
+  </div>
 
-  function renderSide(){
-    const views = state.posts.reduce((n,p)=>n+p.viewCount,0);
-    const likes = state.posts.reduce((n,p)=>n+p.likes,0);
-    const comments = state.posts.reduce((n,p)=>n+p.comments.length,0);
-    $stats.innerHTML = `总浏览：${views} 次<br>总点赞：${likes} 次<br>总评论：${comments} 条`;
-    if(!state.history.length){$history.textContent='暂无';return;}
-    $history.innerHTML = state.history.slice(-10).reverse().map(i=>`• ${i.title}（${fmt(i.at)}）`).join('<br>');
-  }
+  <script>
+    // 页面加载时获取所有动态
+    window.onload = function() {
+      loadPosts();
+    };
 
-  function mediaHtml(list){
-    return list.map(m=>`<div>${m.kind==='video'?`<video controls src="${m.url}"></video>`:`<img src="${m.url}" alt="${m.originalName}">`}<div class="small">原画下载：<a href="${m.downloadUrl}" target="_blank">${m.originalName}</a></div></div>`).join('');
-  }
+    // 加载所有动态
+    async function loadPosts() {
+      try {
+        const res = await fetch('/api/posts');
+        const result = await res.json();
+        if (result.code === 200) {
+          renderPosts(result.data);
+        }
+      } catch (err) {
+        console.error('加载动态失败', err);
+      }
+    }
 
-  function postHtml(p){
-    const comments = p.comments.slice(-3).map(c=>`<div class="small">${c.nickname}：${c.content}</div>`).join('') || '<div class="small">暂无评论</div>';
-    const views = (p.views || []).map(v=>v.name).join('、') || '暂无';
-    return `<article class="post" data-id="${p.id}"><div class="topline"><strong>${p.title}</strong><span class="tag">${p.type==='diary'?'日记':'朋友圈'}</span></div><div class="meta">@${p.author} · ${fmt(p.createdAt)}</div><p>${p.content}</p>${p.media.length?`<div class="media">${mediaHtml(p.media)}</div>`:''}<div class="actions"><button class="btn g" data-a="view">👁 浏览（${p.viewCount}）</button><button class="btn g" data-a="like">👍 点赞（${p.likes}）</button><button class="btn g" data-a="comment">💬 评论</button></div><div class="small">最近浏览：${views}</div><div style="margin-top:6px">${comments}</div></article>`;
-  }
+    // 渲染动态列表
+    function renderPosts(posts) {
+      const postList = document.getElementById('postList');
+      if (posts.length === 0) {
+        postList.innerHTML = '<div style="text-align:center;padding:40px;color:#999;">暂无动态，快来发布第一条吧！</div>';
+        return;
+      }
 
-  function renderFeed(){
-    $feed.innerHTML = state.posts.map(postHtml).join('') || '<div class="small">还没有动态，快发布第一条吧。</div>';
-    renderSide();
-  }
+      let html = '';
+      posts.forEach(post => {
+        // 格式化时间
+        const time = new Date(post.createTime).toLocaleString();
+        // 渲染评论
+        let commentHtml = '';
+        post.comments.forEach(comment => {
+          commentHtml += `
+            <div class="comment-item">
+              <div class="comment-nickname">${comment.nickname}</div>
+              <div class="comment-content">${comment.content}</div>
+            </div>
+          `;
+        });
 
-  async function loadPosts(){
-    const r = await fetch('/api/posts');
-    state.posts = await r.json();
-    renderFeed();
-  }
+        html += `
+          <div class="post-card" id="post-${post.id}">
+            <div class="post-header">
+              <div class="avatar">${post.nickname.charAt(0) || '匿'}</div>
+              <div>
+                <div class="nickname">${post.nickname}</div>
+                <div class="post-time">${time}</div>
+              </div>
+            </div>
+            <div class="post-content">${post.content}</div>
+            <div class="post-stats">
+              <div class="stat-item" onclick="likePost(${post.id})">
+                <span>👍</span>
+                <span id="like-count-${post.id}">${post.likeCount}</span>
+                <span>点赞</span>
+              </div>
+              <div class="stat-item" onclick="viewPost(${post.id})">
+                <span>👀</span>
+                <span id="view-count-${post.id}">${post.viewCount}</span>
+                <span>浏览</span>
+              </div>
+              <div class="stat-item">
+                <span>💬</span>
+                <span>${post.comments.length}</span>
+                <span>评论</span>
+              </div>
+            </div>
+            <div class="comment-section">
+              <div class="comment-list">${commentHtml}</div>
+              <div class="comment-input-box">
+                <input type="text" class="comment-input" id="comment-nickname-${post.id}" placeholder="你的昵称">
+                <input type="text" class="comment-input" id="comment-content-${post.id}" placeholder="写下你的评论...">
+                <button class="comment-btn" onclick="addComment(${post.id})">发送</button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      postList.innerHTML = html;
+    }
 
-  async function login(){
-    const username = prompt('输入登录昵称（仅发布需要登录）', state.username || '');
-    if(!username) return;
-    const r = await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username})});
-    const d = await r.json();
-    if(!r.ok) return toast(d.message || '登录失败');
-    state.token = d.token;
-    state.username = d.user.username;
-    localStorage.setItem('token', state.token);
-    localStorage.setItem('username', state.username);
-    document.getElementById('loginBtn').textContent = `已登录：${state.username}`;
-    toast('登录成功，可发布动态');
-  }
+    // 发布动态
+    async function publishPost() {
+      const nickname = document.getElementById('nickname').value.trim();
+      const content = document.getElementById('postContent').value.trim();
+      
+      if (!content) {
+        alert('请输入动态内容');
+        return;
+      }
 
-  async function publish(e){
-    e.preventDefault();
-    if(!state.token) return toast('请先登录');
-    const fd = new FormData(e.target);
-    const r = await fetch('/api/posts',{method:'POST',headers:{Authorization:`Bearer ${state.token}`},body:fd});
-    const d = await r.json();
-    if(!r.ok) return toast(d.message || '发布失败');
-    e.target.reset();
-    toast('发布成功，已实时同步');
-    await loadPosts();
-  }
+      try {
+        const res = await fetch('/api/posts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nickname, content })
+        });
+        const result = await res.json();
+        if (result.code === 200) {
+          alert('发布成功！');
+          document.getElementById('postContent').value = '';
+          loadPosts(); // 重新加载列表
+        } else {
+          alert(result.message);
+        }
+      } catch (err) {
+        console.error('发布失败', err);
+        alert('发布失败，请重试');
+      }
+    }
 
-  async function viewPost(id){
-    const r = await fetch(`/api/posts/${id}?name=${encodeURIComponent(state.username || '游客')}`,{headers:{'x-visitor-id':state.visitorId}});
-    const d = await r.json();
-    if(!r.ok) return toast(d.message || '浏览失败');
-    const ix = state.posts.findIndex(p=>p.id===id); if(ix>=0) state.posts[ix]=d;
-    state.history.push({id,title:d.title,at:new Date().toISOString()});
-    localStorage.setItem('history', JSON.stringify(state.history.slice(-40)));
-    renderFeed();
-  }
+    // 点赞
+    async function likePost(postId) {
+      try {
+        const res = await fetch(`/api/posts/${postId}/like`, { method: 'POST' });
+        const result = await res.json();
+        if (result.code === 200) {
+          document.getElementById(`like-count-${postId}`).innerText = result.data.likeCount;
+        }
+      } catch (err) {
+        console.error('点赞失败', err);
+      }
+    }
 
-  async function likePost(id){
-    const r = await fetch(`/api/posts/${id}/likes`,{method:'POST',headers:{'x-visitor-id':state.visitorId}});
-    const d = await r.json();
-    if(!r.ok) return toast(d.message || '点赞失败');
-    const p = state.posts.find(i=>i.id===id); if(p) p.likes = d.likes;
-    renderFeed();
-  }
+    // 增加浏览量
+    async function viewPost(postId) {
+      try {
+        const res = await fetch(`/api/posts/${postId}/view`, { method: 'POST' });
+        const result = await res.json();
+        if (result.code === 200) {
+          document.getElementById(`view-count-${postId}`).innerText = result.data.viewCount;
+        }
+      } catch (err) {
+        console.error('更新浏览量失败', err);
+      }
+    }
 
-  async function commentPost(id){
-    const content = prompt('评论内容：'); if(!content) return;
-    const nickname = prompt('昵称（可空）', state.username || '') || '游客';
-    const r = await fetch(`/api/posts/${id}/comments`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nickname,content})});
-    const d = await r.json();
-    if(!r.ok) return toast(d.message || '评论失败');
-    const p = state.posts.find(i=>i.id===id); if(p) p.comments.push(d);
-    renderFeed();
-    toast('评论成功，对方可看到更新');
-  }
+    // 添加评论
+    async function addComment(postId) {
+      const nickname = document.getElementById(`comment-nickname-${postId}`).value.trim();
+      const content = document.getElementById(`comment-content-${postId}`).value.trim();
+      
+      if (!content) {
+        alert('请输入评论内容');
+        return;
+      }
 
-  function initRealtime(){
-    const es = new EventSource('/api/stream');
-    ['post','comment','like','view'].forEach(ev => es.addEventListener(ev, () => loadPosts()));
-    es.onerror = () => toast('实时连接波动，系统会自动重连');
-  }
-
-  document.getElementById('loginBtn').addEventListener('click', login);
-  document.getElementById('publishForm').addEventListener('submit', publish);
-  document.getElementById('menuBtn').addEventListener('click', ()=>document.getElementById('menu').classList.toggle('open'));
-  document.getElementById('togglePublish').addEventListener('click', ()=>{
-    const f = document.getElementById('publishForm');
-    f.style.display = f.style.display === 'none' ? 'grid' : 'none';
-    document.getElementById('menu').classList.remove('open');
-  });
-  document.getElementById('jumpHistory').addEventListener('click', ()=>{
-    document.getElementById('history').scrollIntoView({behavior:'smooth', block:'center'});
-    document.getElementById('menu').classList.remove('open');
-  });
-  document.addEventListener('click', e=>{if(!e.target.closest('.menu')) document.getElementById('menu').classList.remove('open');});
-
-  $feed.addEventListener('click', async (e)=>{
-    const btn = e.target.closest('button[data-a]'); if(!btn) return;
-    const post = e.target.closest('.post'); if(!post) return;
-    const id = post.dataset.id;
-    if(btn.dataset.a === 'view') await viewPost(id);
-    if(btn.dataset.a === 'like') await likePost(id);
-    if(btn.dataset.a === 'comment') await commentPost(id);
-  });
-
-  (async () => {
-    if(state.username) document.getElementById('loginBtn').textContent = `已登录：${state.username}`;
-    await loadPosts();
-    initRealtime();
-  })();
-</script>
+      try {
+        const res = await fetch(`/api/posts/${postId}/comments`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nickname, content })
+        });
+        const result = await res.json();
+        if (result.code === 200) {
+          document.getElementById(`comment-content-${postId}`).value = '';
+          loadPosts(); // 重新加载列表
+        } else {
+          alert(result.message);
+        }
+      } catch (err) {
+        console.error('评论失败', err);
+        alert('评论失败，请重试');
+      }
+    }
+  </script>
 </body>
 </html>
