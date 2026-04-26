@@ -1,41 +1,21 @@
-const express = require('express')
-const cors = require('cors')
-const path = require('path')
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
 
-const app = express()
-app.use(cors())
-app.use(express.json())
+const app = express();
+const port = 3000;
 
-let works = [
-  { id: 1, title: '作品1', likes: 10, views: 152 },
-  { id: 2, title: '作品2', likes: 25, views: 320 }
-]
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname)));
 
-// 静态文件托管
-app.use(express.static(__dirname))
+app.get('/api/hello', (req, res) => {
+  res.json({ 
+    code: 200,
+    message: "🎉 恭喜你！前后端互联成功！这是后端返回的消息" 
+  });
+});
 
-// 首页
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'))
-})
-
-// 获取作品
-app.get('/works', (req, res) => {
-  res.json(works)
-})
-
-// 点赞
-app.post('/like/:id', (req, res) => {
-  const id = Number(req.params.id)
-  const work = works.find(w => w.id === id)
-  if (work) {
-    work.likes++
-    res.json(work)
-  } else {
-    res.status(404).send('not found')
-  }
-})
-
-app.listen(3001, () => {
-  console.log('后端启动：http://localhost:3001')
-})
+app.listen(port, () => {
+  console.log(`✅ 本地服务已启动！请在浏览器打开：http://localhost:${port}`);
+});

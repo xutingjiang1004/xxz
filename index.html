@@ -1,118 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>作品展示</title>
-
+  <title>我的第一个互联网站</title>
   <style>
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont;
-      background: #0f172a;
-      color: #fff;
-      padding: 40px;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    #list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 20px;
-    }
-
-    .card {
-      background: #1e293b;
-      padding: 16px;
-      border-radius: 16px;
-      transition: 0.3s;
-      transform: translateY(20px);
-      opacity: 0;
-      animation: fadeIn 0.5s forwards;
-    }
-
-    .card:hover {
-      transform: translateY(-5px) scale(1.02);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-    }
-
-    .title {
-      font-size: 18px;
-      margin-bottom: 10px;
-    }
-
-    .info {
-      font-size: 14px;
-      color: #94a3b8;
-      margin-bottom: 10px;
-    }
-
-    button {
-      padding: 6px 12px;
-      border: none;
-      border-radius: 8px;
-      background: #3b82f6;
-      color: white;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    button:hover {
-      background: #2563eb;
-    }
-
-    button:active {
-      transform: scale(0.9);
-    }
-
-    @keyframes fadeIn {
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
+    body { font-family: 微软雅黑; text-align: center; padding-top: 100px; }
+    h1 { color: #2c3e50; }
+    .success { color: #27ae60; font-size: 20px; margin-top: 30px; }
+    .error { color: #e74c3c; font-size: 20px; margin-top: 30px; }
   </style>
 </head>
-
 <body>
-  <h1>作品列表</h1>
-  <div id="list"></div>
+  <h1>🌐 我的互联网站测试页</h1>
+  <div id="result">正在连接后端...</div>
 
   <script>
-    const listDiv = document.getElementById('list')
-
-    function loadData() {
-      fetch('/works')
-        .then(res => res.json())
-        .then(data => {
-          listDiv.innerHTML = ''
-
-          data.forEach((item, index) => {
-            const div = document.createElement('div')
-            div.className = 'card'
-
-            div.style.animationDelay = index * 0.1 + 's'
-
-            div.innerHTML = `
-              <div class="title">${item.title}</div>
-              <div class="info">👍 ${item.likes} ｜ 👀 ${item.views}</div>
-              <button onclick="like(${item.id})">点赞</button>
-            `
-
-            listDiv.appendChild(div)
-          })
-        })
-    }
-
-    function like(id) {
-      fetch('/like/' + id, { method: 'POST' })
-        .then(() => loadData())
-    }
-
-    loadData()
+    fetch('/api/hello')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('result').className = 'success';
+        document.getElementById('result').innerText = data.message;
+      })
+      .catch(err => {
+        document.getElementById('result').className = 'error';
+        document.getElementById('result').innerText = "❌ 后端连接失败，请检查服务是否启动";
+      });
   </script>
 </body>
 </html>
