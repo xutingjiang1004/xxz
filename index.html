@@ -3,556 +3,206 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>液态玻璃小圈子</title>
+  <title>管理系统 - 登录</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
-    }
-
-    /* 彩色Blob流体背景 */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       min-height: 100vh;
-      background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3), transparent 40%),
-                  radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3), transparent 40%),
-                  radial-gradient(circle at 40% 40%, rgba(119, 209, 255, 0.2), transparent 40%),
-                  #1a1a2e;
-      background-attachment: fixed;
-      overflow-x: hidden;
-      padding-bottom: 80px;
-    }
-
-    /* 顶部玻璃导航栏 */
-    .glass-nav {
-      position: sticky;
-      top: 0;
-      z-index: 999;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(255,255,255,0.2);
-      padding: 18px 20px;
-      text-align: center;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
-
-    .glass-nav h1 {
-      color: #fff;
+    .container { width: 100%; max-width: 400px; padding: 20px; }
+    .login-box, .dashboard-box {
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .dashboard-box { display: none; max-width: 800px; }
+    h1 { color: #2c3e50; margin-bottom: 30px; text-align: center; font-size: 28px; }
+    h2 { color: #2c3e50; margin-bottom: 20px; text-align: center; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; color: #555; font-weight: 500; }
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+    input:focus { outline: none; border-color: #667eea; }
+    .btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
       font-size: 18px;
       font-weight: 600;
-      opacity: 0.95;
-    }
-
-    /* 玻璃卡片通用样式 */
-    .glass-card {
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 20px;
-      margin: 16px;
-      padding: 22px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-      animation: fadeIn 0.5s ease forwards;
-    }
-
-    /* 入场动画 */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* 二次菜单按钮（发布入口） */
-    .menu-btn {
-      background: linear-gradient(90deg, #6366f1, #8b5cf6);
-      color: #fff;
-      border: none;
-      border-radius: 14px;
-      padding: 10px 16px;
-      font-size: 14px;
       cursor: pointer;
-      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
     }
-
-    .menu-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4); }
+    .btn:active { transform: translateY(0); }
+    .btn-logout {
+      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+      margin-top: 30px;
     }
-
-    /* 发布面板（默认隐藏） */
-    .publish-panel {
-      display: none;
-    }
-
-    .publish-panel.show {
-      display: block;
-    }
-
-    /* 输入框 */
-    .glass-input {
-      width: 100%;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 14px;
-      padding: 14px 16px;
-      margin: 10px 0;
-      color: #fff;
-      font-size: 15px;
-      outline: none;
-    }
-
-    .glass-input::placeholder {
-      color: rgba(255,255,255,0.5);
-    }
-
-    /* 玻璃按钮 */
-    .glass-btn {
-      background: linear-gradient(90deg, #6366f1, #8b5cf6);
-      color: #fff;
-      border: none;
-      border-radius: 14px;
-      padding: 12px 24px;
-      font-size: 15px;
-      font-weight: 500;
-      float: right;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-    }
-
-    .glass-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
-    }
-
-    .glass-btn:active {
-      transform: translateY(0);
-    }
-
-    .clearfix::after {
-      content: "";
-      clear: both;
-      display: table;
-    }
-
-    /* 动态卡片 */
-    .post-card {
-      color: #fff;
-      opacity: 0.95;
-    }
-
-    .post-user {
-      display: flex;
-      align-items: center;
-      margin-bottom: 14px;
-    }
-
-    .avatar {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: linear-gradient(90deg, #6366f1, #ec4899);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      margin-right: 12px;
-    }
-
-    .post-content {
-      line-height: 1.6;
-      margin: 16px 0;
-      font-size: 15px;
-    }
-
-    /* 媒体（图片/视频） */
-    .post-media {
-      max-width: 100%;
-      border-radius: 12px;
-      margin: 10px 0;
-    }
-
-    /* 下载按钮 */
-    .download-btn {
-      background: rgba(255,255,255,0.1);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,0.2);
+    .btn-logout:hover { box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4); }
+    .error-msg { color: #e74c3c; text-align: center; margin-bottom: 20px; display: none; font-size: 14px; }
+    .user-info {
+      background: #f8f9fa;
+      padding: 20px;
       border-radius: 10px;
-      padding: 8px 16px;
-      font-size: 13px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 10px;
-    }
-
-    .download-btn:hover {
-      background: rgba(255,255,255,0.2);
-    }
-
-    /* 交互栏 */
-    .action-bar {
-      display: flex;
-      gap: 24px;
-      padding: 12px 0;
-      border-top: 1px solid rgba(255,255,255,0.1);
-      font-size: 13px;
-      color: rgba(255,255,255,0.7);
-    }
-
-    .action {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-    }
-
-    .action:hover {
-      color: #fff;
-      transform: scale(1.05);
-    }
-
-    /* 评论区 */
-    .comment-item {
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      font-size: 13px;
-    }
-
-    .comment-name {
-      color: #a78bfa;
-      font-weight: 500;
-    }
-
-    .comment-input-box {
-      display: flex;
-      gap: 8px;
-      margin-top: 14px;
-    }
-
-    /* Toast轻提示 */
-    .toast {
-      position: fixed;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%) translateY(30px);
-      background: rgba(0,0,0,0.7);
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 12px;
-      font-size: 14px;
-      opacity: 0;
-      z-index: 9999;
-      pointer-events: none;
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    /* 登录模态框 */
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-
-    .modal-content {
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 20px;
-      padding: 30px;
-      width: 90%;
-      max-width: 400px;
-      color: #fff;
-    }
-
-    .modal h2 {
       margin-bottom: 20px;
-      text-align: center;
     }
-
-    /* 空状态 */
-    .empty {
-      text-align: center;
-      padding: 60px 20px;
-      color: rgba(255,255,255,0.4);
-      font-size: 15px;
+    .user-info p { margin: 10px 0; color: #555; }
+    .user-info span { color: #2c3e50; font-weight: 600; }
+    .menu {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-top: 20px;
     }
+    .menu-item {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .menu-item:hover { transform: scale(1.05); }
+    .menu-item h3 { font-size: 16px; margin-bottom: 5px; }
+    .menu-item p { font-size: 12px; opacity: 0.8; }
+    .status { text-align: center; padding: 10px; background: #d4edda; color: #155724; border-radius: 8px; margin-bottom: 20px; }
   </style>
 </head>
-
 <body>
-  <!-- 登录模态框（默认显示） -->
-  <div class="modal" id="loginModal">
-    <div class="modal-content">
-      <h2>欢迎来到小圈子</h2>
-      <input class="glass-input" id="loginNickname" placeholder="请输入昵称">
-      <button class="glass-btn" style="width:100%;margin-top:10px" onclick="handleLogin()">进入</button>
+  <div class="container">
+    <div class="login-box" id="loginBox">
+      <h1>🔐 管理登录</h1>
+      <div class="error-msg" id="errorMsg"></div>
+      <form id="loginForm">
+        <div class="form-group">
+          <label>用户名</label>
+          <input type="text" id="username" placeholder="请输入用户名" required>
+        </div>
+        <div class="form-group">
+          <label>密码</label>
+          <input type="password" id="password" placeholder="请输入密码" required>
+        </div>
+        <button type="submit" class="btn">登 录</button>
+      </form>
+    </div>
+
+    <div class="dashboard-box" id="dashboardBox">
+      <h1>📊 管理后台</h1>
+      <div class="status" id="status">✅ 已登录</div>
+      <div class="user-info">
+        <p>👤 用户名：<span id="userName"></span></p>
+        <p>🕐 登录时间：<span id="loginTime"></span></p>
+        <p>🔑 登录方式：<span>密码登录</span></p>
+      </div>
+      <div class="menu">
+        <div class="menu-item">
+          <h3>📦 商品管理</h3>
+          <p>管理系统商品</p>
+        </div>
+        <div class="menu-item">
+          <h3>👥 用户管理</h3>
+          <p>管理注册用户</p>
+        </div>
+        <div class="menu-item">
+          <h3>📈 数据统计</h3>
+          <p>查看运营数据</p>
+        </div>
+        <div class="menu-item">
+          <h3>⚙️ 系统设置</h3>
+          <p>系统配置管理</p>
+        </div>
+      </div>
+      <button class="btn btn-logout" onclick="logout()">退 出 登 录</button>
     </div>
   </div>
 
-  <!-- 顶部导航 -->
-  <div class="glass-nav">
-    <h1>✨ 液态玻璃小圈子</h1>
-    <button class="menu-btn" onclick="togglePublishPanel()">发布动态</button>
-  </div>
-
-  <!-- 发布面板（默认隐藏） -->
-  <div class="glass-card publish-panel clearfix" id="publishPanel">
-    <input class="glass-input" id="publishNickname" placeholder="昵称（登录用户自动填充）">
-    <textarea class="glass-input" id="content" rows="3" placeholder="分享你的动态..."></textarea>
-    <input type="file" class="glass-input" id="mediaUpload" accept="image/*,video/*" placeholder="上传图片/视频">
-    <button class="glass-btn" onclick="publishPost()">发布</button>
-  </div>
-
-  <!-- 动态列表 -->
-  <div id="postList"></div>
-
-  <!-- Toast提示 -->
-  <div class="toast" id="toast"></div>
-
   <script>
-    // 全局变量
-    let userInfo = null;
-    let toastTimer = null;
-    let eventSource = null;
+    const loginBox = document.getElementById('loginBox');
+    const dashboardBox = document.getElementById('dashboardBox');
+    const loginForm = document.getElementById('loginForm');
+    const errorMsg = document.getElementById('errorMsg');
+    const statusDiv = document.getElementById('status');
 
-    // 页面加载
-    window.onload = () => {
-      // 检查是否已登录
-      const savedUser = localStorage.getItem('userInfo');
-      if (savedUser) {
-        userInfo = JSON.parse(savedUser);
-        document.getElementById('loginModal').style.display = 'none';
-        document.getElementById('publishNickname').value = userInfo.nickname;
-      }
-      loadPosts();
-      initSSE();
-    };
-
-    // Toast提示（替代alert）
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      toast.textContent = msg;
-      toast.classList.add('show');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => {
-        toast.classList.remove('show');
-      }, 2000);
-    }
-
-    // 登录处理
-    async function handleLogin() {
-      const nickname = document.getElementById('loginNickname').value.trim();
-      if (!nickname) return showToast('请输入昵称');
-
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nickname })
-      });
-      const data = await res.json();
-      if (data.code === 200) {
-        userInfo = data.data;
-        localStorage.setItem('userInfo', JSON.stringify(userInfo));
-        document.getElementById('loginModal').style.display = 'none';
-        document.getElementById('publishNickname').value = nickname;
-        showToast('登录成功 ✅');
+    function checkLogin() {
+      const token = localStorage.getItem('token');
+      if (token) {
+        showDashboard();
+      } else {
+        showLogin();
       }
     }
 
-    // 切换发布面板显示/隐藏（二次菜单）
-    function togglePublishPanel() {
-      if (!userInfo) {
-        showToast('请先登录后再发布');
-        return;
-      }
-      const panel = document.getElementById('publishPanel');
-      panel.classList.toggle('show');
+    function showLogin() {
+      loginBox.style.display = 'block';
+      dashboardBox.style.display = 'none';
     }
 
-    // 加载动态
-    async function loadPosts() {
+    function showDashboard() {
+      loginBox.style.display = 'none';
+      dashboardBox.style.display = 'block';
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      document.getElementById('userName').textContent = user.username || '未知用户';
+      document.getElementById('loginTime').textContent = user.loginTime || new Date().toLocaleString();
+    }
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
       try {
-        const res = await fetch('/api/posts');
-        const data = await res.json();
-        renderPosts(data.data || []);
-      } catch (e) { 
-        console.error('加载失败', e);
-        showToast('加载失败');
-      }
-    }
-
-    // 渲染动态
-    function renderPosts(posts) {
-      const list = document.getElementById('postList');
-      if (posts.length === 0) {
-        list.innerHTML = '<div class="empty">暂无动态，快来发布第一条吧～</div>';
-        return;
-      }
-
-      let html = '';
-      posts.forEach(p => {
-        const time = new Date(p.createTime).toLocaleString();
-        let mediaHtml = '';
-        let downloadBtn = '';
-
-        // 渲染图片/视频
-        if (p.media) {
-          if (p.media.type.startsWith('image')) {
-            mediaHtml = `<img src="${p.media.data}" class="post-media" alt="${p.media.name}">`;
-          } else if (p.media.type.startsWith('video')) {
-            mediaHtml = `<video src="${p.media.data}" class="post-media" controls alt="${p.media.name}"></video>`;
-          }
-          // 下载按钮
-          downloadBtn = `<button class="download-btn" onclick="downloadMedia('${p.media.data}', '${p.media.name}')">⬇️ 下载原文件</button>`;
-        }
-
-        // 渲染评论
-        let comments = '';
-        p.comments.forEach(c => {
-          comments += `<div class="comment-item"><span class="comment-name">${c.nickname}</span>：${c.content}</div>`;
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
         });
+        const data = await res.json();
 
-        html += `
-        <div class="glass-card post-card" id="post-${p.id}">
-          <div class="post-user">
-            <div class="avatar">${p.nickname.charAt(0) || '匿'}</div>
-            <div>
-              <div>${p.nickname}</div>
-              <div style="font-size:12px;color:rgba(255,255,255,0.5)">${time}</div>
-            </div>
-          </div>
-          <div class="post-content">${p.content}</div>
-          ${mediaHtml}
-          ${downloadBtn}
-          <div class="action-bar">
-            <div class="action" onclick="like(${p.id})">👍 ${p.likeCount}</div>
-            <div class="action" onclick="view(${p.id})">👀 ${p.viewCount}</div>
-            <div class="action">💬 ${p.comments.length}</div>
-          </div>
-          <div style="margin-top:12px">${comments}</div>
-          <div class="comment-input-box">
-            <input class="glass-input" style="flex:0.3" id="c_nick_${p.id}" placeholder="昵称">
-            <input class="glass-input" style="flex:1" id="c_text_${p.id}" placeholder="发表评论...">
-            <button class="glass-btn" style="padding:10px 16px" onclick="comment(${p.id})">发送</button>
-          </div>
-        </div>`;
-      });
-      list.innerHTML = html;
-    }
-
-    // 下载媒体文件
-    function downloadMedia(data, filename) {
-      const link = document.createElement('a');
-      link.href = data;
-      link.download = filename;
-      link.click();
-      showToast('开始下载...');
-    }
-
-    // 发布动态（带文件上传）
-    async function publishPost() {
-      if (!userInfo) return showToast('请先登录');
-
-      const nickname = document.getElementById('publishNickname').value.trim();
-      const content = document.getElementById('content').value.trim();
-      const mediaFile = document.getElementById('mediaUpload').files[0];
-
-      const formData = new FormData();
-      formData.append('nickname', nickname || userInfo.nickname);
-      formData.append('content', content);
-      formData.append('token', userInfo.token);
-      if (mediaFile) {
-        formData.append('media', mediaFile);
-      }
-
-      const res = await fetch('/api/posts', {
-        method: 'POST',
-        body: formData
-      });
-      const data = await res.json();
-      if (data.code === 200) {
-        showToast('发布成功 ✅');
-        document.getElementById('content').value = '';
-        document.getElementById('mediaUpload').value = '';
-        document.getElementById('publishPanel').classList.remove('show');
-      } else {
-        showToast(data.msg || '发布失败');
-      }
-    }
-
-    // 点赞
-    async function like(id) {
-      const res = await fetch(`/api/posts/${id}/like`, { method: 'POST' });
-      const data = await res.json();
-      if (data.code === 200) {
-        showToast('点赞成功');
-      } else {
-        showToast(data.msg || '点赞失败');
-      }
-    }
-
-    // 浏览量
-    async function view(id) {
-      await fetch(`/api/posts/${id}/view`, { method: 'POST' });
-    }
-
-    // 评论（游客无需登录）
-    async function comment(id) {
-      const nick = document.getElementById(`c_nick_${id}`).value.trim();
-      const text = document.getElementById(`c_text_${id}`).value.trim();
-      if (!text) return showToast('请输入评论');
-
-      const res = await fetch(`/api/posts/${id}/comment`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nickname: nick, content: text })
-      });
-      const data = await res.json();
-      if (data.code === 200) {
-        showToast('评论成功');
-        document.getElementById(`c_text_${id}`).value = '';
-      } else {
-        showToast(data.msg || '评论失败');
-      }
-    }
-
-    // 初始化SSE实时更新
-    function initSSE() {
-      eventSource = new EventSource('/api/events');
-      eventSource.onmessage = (event) => {
-        const { type, data } = JSON.parse(event.data);
-        // 收到更新后重新加载动态
-        loadPosts();
-        // 显示提示
-        if (type === 'newPost') {
-          showToast('有新动态发布啦！');
-        } else if (type === 'newComment') {
-          showToast('收到新评论！');
+        if (data.code === 200) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify({
+            username: data.username,
+            loginTime: new Date().toLocaleString()
+          }));
+          showDashboard();
+        } else {
+          errorMsg.textContent = data.message || '登录失败，请检查用户名和密码';
+          errorMsg.style.display = 'block';
         }
-      };
-      eventSource.onerror = () => {
-        console.error('SSE连接失败，3秒后重试');
-        setTimeout(initSSE, 3000);
-      };
+      } catch (err) {
+        errorMsg.textContent = '❌ 网络错误，请检查服务器连接';
+        errorMsg.style.display = 'block';
+      }
+    });
+
+    async function logout() {
+      try {
+        await fetch('/api/logout', { method: 'POST' });
+      } catch (e) {}
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      showLogin();
+      document.getElementById('username').value = '';
+      document.getElementById('password').value = '';
     }
+
+    checkLogin();
   </script>
 </body>
 </html>
