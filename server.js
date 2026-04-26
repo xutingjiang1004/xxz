@@ -1,7 +1,9 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
 
 // 基础配置
+app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
@@ -65,5 +67,13 @@ app.post('/api/posts/:id/comment', (req, res) => {
   res.json({ code: 200 });
 });
 
-// Vercel 必须导出（核心！不导出必报错）
+// ========== Render 必须的启动配置 ==========
+// 读取 Render 自动分配的端口
+const port = process.env.PORT || 3000;
+// 监听 0.0.0.0（Render 强制要求，不能只监听 localhost）
+app.listen(port, '0.0.0.0', () => {
+  console.log(`✅ Render 服务器启动成功！端口：${port}`);
+});
+
+// 兼容 Vercel（不影响 Render）
 module.exports = app;
