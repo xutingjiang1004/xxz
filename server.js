@@ -2,16 +2,15 @@ const express = require('express');
 const path = require('path');
 const app = express();
 
-// 关键修复1：适配Render线上端口，本地默认3000
+// 适配Render线上端口，本地默认3000
 const port = process.env.PORT || 3000;
 
-// 关键修复2：用绝对路径定位public文件夹，线上线下都能精准找到文件
-const publicPath = path.join(__dirname, 'public');
-app.use(express.static(publicPath));
+// 关键修改：直接读取根目录的index.html，不用public文件夹
+app.use(express.static(__dirname));
 
-// 首页路由，兜底确保能找到index.html
+// 首页路由，精准匹配根目录的index.html
 app.get('/', (req, res) => {
-  res.sendFile(path.join(publicPath, 'index.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // 监听所有网卡，适配所有环境
