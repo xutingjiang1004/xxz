@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Moments Secure</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar glass">
+      <div>
+        <h1>Moments Secure</h1>
+        <p class="sub">朋友圈风格 · 点赞/浏览/作品下载</p>
+      </div>
+      <div id="auth-panel"></div>
+    </header>
+
+    <main class="container">
+      <section class="glass records">
+        <h2>公共浏览记录</h2>
+        <ul id="browse-log"></ul>
+      </section>
+
+      <section>
+        <h2>朋友圈动态</h2>
+        <div id="timeline" class="timeline"></div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav glass">
+      <button class="nav-btn active" id="nav-feed">浏览</button>
+      <div class="menu-wrap">
+        <button class="nav-btn" id="nav-more">二次菜单</button>
+        <div id="secondary-menu" class="secondary-menu hidden">
+          <button id="open-publish" class="menu-item">发布作品</button>
+        </div>
+      </div>
+    </nav>
+
+    <dialog id="publish-dialog" class="glass">
+      <form id="post-form" method="dialog" class="composer">
+        <h3>发布作品</h3>
+        <label>标题 <input type="text" id="post-title" required maxlength="60" /></label>
+        <label>内容 <textarea id="post-content" rows="4" required maxlength="500"></textarea></label>
+        <label>上传原画质照片/视频
+          <input type="file" id="post-media" accept="image/*,video/*" />
+        </label>
+        <div id="media-preview-wrap" class="hidden"></div>
+        <div class="row">
+          <button type="button" id="cancel-publish" class="btn ghost">取消</button>
+          <button type="submit" class="btn primary">发布</button>
+        </div>
+      </form>
+    </dialog>
+
+    <template id="post-template">
+      <article class="post glass">
+        <div class="post-top">
+          <h3 class="title"></h3>
+          <time class="time"></time>
+        </div>
+        <p class="content"></p>
+        <div class="media-wrap"></div>
+        <p class="meta"></p>
+        <div class="actions">
+          <button class="btn like-btn">👍 点赞 <span class="like-count">0</span></button>
+          <span>浏览 <b class="view-count">0</b></span>
+          <a class="download-link" href="#" download>下载原文件</a>
+        </div>
+        <section class="comments">
+          <h4>评论（游客可发）</h4>
+          <ul class="comment-list"></ul>
+          <form class="comment-form">
+            <input class="comment-input" required maxlength="120" placeholder="说点什么..." />
+            <button class="btn" type="submit">发送</button>
+          </form>
+        </section>
+      </article>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>

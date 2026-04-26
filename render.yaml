@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: moments-secure
+    runtime: node
+    plan: starter
+    autoDeploy: true
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: APP_SECRET
+        generateValue: true
+      - key: DATA_DIR
+        value: /var/data/moments/data
+      - key: UPLOAD_DIR
+        value: /var/data/moments/uploads
+    disks:
+      - name: moments-disk
+        mountPath: /var/data/moments
+        sizeGB: 1

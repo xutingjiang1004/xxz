@@ -1,0 +1,11 @@
+{
+  "name": "xxz-moments-lite",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Moments Lite static app",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check app.js && node --check server.js",
+    "tunnel": "npx localtunnel --port 3000"
+  }
+}
