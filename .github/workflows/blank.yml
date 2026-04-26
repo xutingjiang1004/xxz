@@ -1,49 +1,44 @@
-diff --git a/.github/workflows/blank.yml b/.github/workflows/blank.yml
-index 01502b13e19cf0e0a38e7168405fc4a28e65338e..e4367bb54e4c81e4e84b6bf20d08afe99f12790b 100644
---- a/.github/workflows/blank.yml
-+++ b/.github/workflows/blank.yml
-@@ -1,36 +1,16 @@
--# This is a basic workflow to help you get started with Actions
-+name: ci
- 
--name: CI
--
--# Controls when the workflow will run
- on:
--  # Triggers the workflow on push or pull request events but only for the "main" branch
-   push:
--    branches: [ "main" ]
--  pull_request:
--    branches: [ "main" ]
--
--  # Allows you to run this workflow manually from the Actions tab
--  workflow_dispatch:
-+    branches: ["main"]
- 
--# A workflow run is made up of one or more jobs that can run sequentially or in parallel
- jobs:
--  # This workflow contains a single job called "build"
--  build:
--    # The type of runner that the job will run on
-+  check:
-     runs-on: ubuntu-latest
--
--    # Steps represent a sequence of tasks that will be executed as part of the job
-     steps:
--      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-       - uses: actions/checkout@v4
--
--      # Runs a single command using the runners shell
--      - name: Run a one-line script
--        run: echo Hello, world!
--
--      # Runs a set of commands using the runners shell
--      - name: Run a multi-line script
--        run: |
--          echo Add other actions to build,
--          echo test, and deploy your project.
-+      - uses: actions/setup-node@v4
-+        with:
-+          node-version: 20
-+      - run: npm ci
-+      - run: npm run check
+# This is a basic workflow to help you get started with Actions
+name: ci
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    branches: ["main"]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+  check:
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo Hello, world!
+
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
+        run: |
+          echo Add other actions to build,
+          echo test, and deploy your project.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm run check
