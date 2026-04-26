@@ -1,199 +1,346 @@
-diff --git a/index.html b/index.html
-index 28285c77b290a56a5b7619f9b58b6be68d705632..2e0d09b81e0e4d618268f70ce623d2784dd70495 100644
---- a/index.html
-+++ b/index.html
-@@ -1,30 +1,163 @@
--<!DOCTYPE html>
--<html lang="zh-CN">
--<head>
--  <meta charset="UTF-8">
--  <title>我的第一个互联网站</title>
--  <style>
--    body { font-family: 微软雅黑; text-align: center; padding-top: 100px; }
--    h1 { color: #2c3e50; }
--    .success { color: #27ae60; font-size: 20px; margin-top: 30px; }
--    .error { color: #e74c3c; font-size: 20px; margin-top: 30px; }
--  </style>
--</head>
--<body>
--  <h1>🌐 我的互联网站测试页</h1>
--  <div id="result">正在连接后端...</div>
--
--  <script>
--    fetch('/api/hello')
--      .then(res => res.json())
--      .then(data => {
--        document.getElementById('result').className = 'success';
--        document.getElementById('result').innerText = data.message;
--      })
--      .catch(err => {
--        document.getElementById('result').className = 'error';
--        document.getElementById('result').innerText = "❌ 后端连接失败，请检查服务是否启动";
--      });
--  </script>
--</body>
--</html>
-\ No newline at end of file
-+<!doctype html>
-+<html lang="zh-CN">
-+<head>
-+  <meta charset="utf-8" />
-+  <meta name="viewport" content="width=device-width, initial-scale=1" />
-+  <title>液态玻璃朋友圈</title>
-+  <style>
-+    :root{--txt:#0f172a;--sub:#475569;--pri:#6366f1;--line:rgba(255,255,255,.35)}
-+    *{box-sizing:border-box}
-+    body{margin:0;min-height:100vh;color:var(--txt);font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:linear-gradient(130deg,#c7d2fe 0%,#dbeafe 35%,#fae8ff 70%,#bfdbfe 100%);overflow-x:hidden}
-+    .bg-blob{position:fixed;filter:blur(40px);z-index:-1;opacity:.45;animation:float 12s ease-in-out infinite}
-+    .b1{width:320px;height:320px;background:#818cf8;border-radius:48% 52% 45% 55%/58% 41% 59% 42%;left:-80px;top:-70px}
-+    .b2{width:420px;height:420px;background:#22d3ee;border-radius:60% 40% 63% 37%/44% 58% 42% 56%;right:-120px;top:120px;animation-delay:1.5s}
-+    .b3{width:380px;height:380px;background:#f472b6;border-radius:53% 47% 37% 63%/36% 67% 33% 64%;left:20%;bottom:-140px;animation-delay:2.5s}
-+
-+    .app{max-width:1120px;margin:0 auto;padding:18px}
-+    .glass{background:rgba(255,255,255,.28);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);border:1px solid var(--line);box-shadow:0 20px 40px rgba(15,23,42,.15)}
-+
-+    .top{position:sticky;top:14px;z-index:20;border-radius:20px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;animation:enter .5s ease}
-+    .title{font-size:24px;font-weight:800;letter-spacing:.4px}
-+    .sub{font-size:12px;color:var(--sub)}
-+
-+    .grid{display:grid;grid-template-columns:1fr 340px;gap:14px;margin-top:14px}
-+    .panel{border-radius:20px;padding:14px}
-+    .feed{display:grid;gap:12px}
-+
-+    .post{border-radius:16px;padding:12px;background:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.5);transition:all .25s ease;animation:rise .35s ease}
-+    .post:hover{transform:translateY(-3px);box-shadow:0 16px 28px rgba(30,41,59,.14)}
-+    .meta{font-size:12px;color:var(--sub)}
-+    .small{font-size:12px;color:var(--sub)}
-+
-+    .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-+    .btn{border:0;border-radius:12px;padding:9px 12px;cursor:pointer;font-weight:700;transition:all .2s ease}
-+    .btn:hover{transform:translateY(-1px)} .btn:active{transform:translateY(1px) scale(.99)}
-+    .btn-primary{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 10px 20px rgba(99,102,241,.3)}
-+    .btn-ghost{background:rgba(255,255,255,.62);color:#312e81;border:1px solid rgba(255,255,255,.7)}
-+
-+    textarea,input{width:100%;border:1px solid rgba(255,255,255,.55);background:rgba(255,255,255,.56);border-radius:12px;padding:10px;font:inherit;outline:none;transition:border-color .2s ease,box-shadow .2s ease}
-+    textarea:focus,input:focus{border-color:#818cf8;box-shadow:0 0 0 3px rgba(129,140,248,.25)}
-+    textarea{min-height:102px;resize:vertical}
-+
-+    .toast{position:fixed;right:18px;bottom:18px;background:rgba(15,23,42,.9);color:#fff;padding:10px 12px;border-radius:10px;opacity:0;transform:translateY(10px);transition:all .2s ease;pointer-events:none}
-+    .toast.show{opacity:1;transform:none}
-+
-+    @keyframes float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-14px) rotate(8deg)}}
-+    @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-+    @keyframes enter{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
-+    @media (max-width:940px){.grid{grid-template-columns:1fr}.title{font-size:22px}}
-+  </style>
-+</head>
-+<body>
-+<div class="bg-blob b1"></div><div class="bg-blob b2"></div><div class="bg-blob b3"></div>
-+
-+<div class="app">
-+  <header class="top glass">
-+    <div>
-+      <div class="title">💧 液态玻璃朋友圈</div>
-+      <div class="sub">Vercel Serverless 内存模式：登录发布、游客评论点赞、浏览计数、实时同步 · UI版本 liquid-glass-v2</div>
-+    </div>
-+    <button id="loginBtn" class="btn btn-primary">登录</button>
-+  </header>
-+
-+  <main class="grid">
-+    <section class="panel glass">
-+      <div style="font-weight:800;margin-bottom:8px">动态广场</div>
-+      <div id="feed" class="feed"></div>
-+    </section>
-+
-+    <aside class="panel glass">
-+      <div style="font-weight:800;margin-bottom:8px">发布文字动态</div>
-+      <form id="publishForm">
-+        <textarea name="content" placeholder="发一条你此刻的心情..." required></textarea>
-+        <button class="btn btn-primary" type="submit" style="margin-top:8px">发布</button>
-+      </form>
-+
-+      <div style="font-weight:800;margin:14px 0 6px">全站统计</div>
-+      <div id="stats" class="small">加载中...</div>
-+    </aside>
-+  </main>
-+</div>
-+
-+<div id="toast" class="toast"></div>
-+
-+<script>
-+const state={token:localStorage.getItem('token')||'',username:localStorage.getItem('username')||'',visitorId:localStorage.getItem('visitorId')||crypto.randomUUID(),posts:[]};
-+localStorage.setItem('visitorId',state.visitorId);
-+const feed=document.getElementById('feed');
-+const stats=document.getElementById('stats');
-+const loginBtn=document.getElementById('loginBtn');
-+const toastEl=document.getElementById('toast');
-+
-+const fmt=(t)=>new Date(t).toLocaleString('zh-CN',{hour12:false});
-+function toast(msg){toastEl.textContent=msg;toastEl.classList.add('show');setTimeout(()=>toastEl.classList.remove('show'),1800);}
-+
-+function renderStats(){
-+  const views=state.posts.reduce((n,p)=>n+p.viewCount,0);
-+  const likes=state.posts.reduce((n,p)=>n+p.likes,0);
-+  const comments=state.posts.reduce((n,p)=>n+p.comments.length,0);
-+  stats.innerHTML=`总浏览：${views} 次<br>总点赞：${likes} 次<br>总评论：${comments} 条`;
-+}
-+
-+function card(p){
-+  const comments=p.comments.slice(-3).map(c=>`<div class='small'>${c.nickname}：${c.content}</div>`).join('')||"<div class='small'>暂无评论</div>";
-+  const viewers=(p.recentViewers||[]).map(v=>v.viewer).join('、')||'暂无';
-+  return `<article class='post' data-id='${p.id}'><div><strong>@${p.author}</strong></div><div class='meta'>${fmt(p.createdAt)}</div><p>${p.content}</p><div class='actions'><button class='btn btn-ghost' data-a='view'>👁 浏览（${p.viewCount}）</button><button class='btn btn-ghost' data-a='like'>👍 点赞（${p.likes}）</button><button class='btn btn-ghost' data-a='comment'>💬 评论</button></div><div class='small'>最近浏览：${viewers}</div><div style='margin-top:8px'>${comments}</div></article>`;
-+}
-+
-+function render(){feed.innerHTML=state.posts.map(card).join('')||'<div class="small">还没有动态，发第一条试试 ✨</div>';renderStats();}
-+
-+async function load(){const r=await fetch('/api/posts');state.posts=await r.json();render();}
-+
-+async function login(){
-+  const username=prompt('输入昵称（发布动态需要登录）',state.username||'');
-+  if(!username) return;
-+  const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username})});
-+  const d=await r.json();
-+  if(!r.ok) return toast(d.message||'登录失败');
-+  state.token=d.token;state.username=d.user.username;localStorage.setItem('token',state.token);localStorage.setItem('username',state.username);loginBtn.textContent=`已登录：${state.username}`;toast('登录成功');
-+}
-+
-+async function publish(e){
-+  e.preventDefault();
-+  if(!state.token) return toast('请先登录');
-+  const content=e.target.content.value.trim();
-+  const r=await fetch('/api/posts',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${state.token}`},body:JSON.stringify({content})});
-+  const d=await r.json();
-+  if(!r.ok) return toast(d.message||'发布失败');
-+  e.target.reset();toast('发布成功');await load();
-+}
-+
-+async function viewPost(id){
-+  const r=await fetch(`/api/posts/${id}?name=${encodeURIComponent(state.username||'游客')}`);
-+  const d=await r.json();
-+  if(!r.ok) return toast(d.message||'浏览失败');
-+  const i=state.posts.findIndex(p=>p.id===id);if(i>=0) state.posts[i]=d;render();
-+}
-+
-+async function likePost(id){
-+  const r=await fetch(`/api/posts/${id}/likes`,{method:'POST',headers:{'x-visitor-id':state.visitorId}});
-+  const d=await r.json();
-+  if(!r.ok) return toast(d.message||'点赞失败');
-+  const p=state.posts.find(i=>i.id===id);if(p) p.likes=d.likes;render();
-+}
-+
-+async function commentPost(id){
-+  const content=prompt('输入评论内容');if(!content) return;
-+  const nickname=prompt('昵称（可空）',state.username||'')||'游客';
-+  const r=await fetch(`/api/posts/${id}/comments`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nickname,content})});
-+  const d=await r.json();
-+  if(!r.ok) return toast(d.message||'评论失败');
-+  const p=state.posts.find(i=>i.id===id);if(p) p.comments.push(d);render();toast('评论成功');
-+}
-+
-+function realtime(){const es=new EventSource('/api/stream');['post','comment','like','view'].forEach(evt=>es.addEventListener(evt,load));es.onerror=()=>toast('实时连接波动，自动重连中');}
-+
-+feed.addEventListener('click',async(e)=>{const btn=e.target.closest('button[data-a]');if(!btn) return;const el=e.target.closest('.post');if(!el) return;const id=el.dataset.id;if(btn.dataset.a==='view') await viewPost(id);if(btn.dataset.a==='like') await likePost(id);if(btn.dataset.a==='comment') await commentPost(id);});
-+document.getElementById('publishForm').addEventListener('submit',publish);
-+loginBtn.addEventListener('click',login);
-+
-+(async()=>{if(state.username) loginBtn.textContent=`已登录：${state.username}`;await load();realtime();})();
-+</script>
-+</body>
-+</html>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>液态玻璃小圈子</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    /* 彩色Blob流体背景 */
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3), transparent 40%),
+                  radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3), transparent 40%),
+                  radial-gradient(circle at 40% 40%, rgba(119, 209, 255, 0.2), transparent 40%),
+                  #1a1a2e;
+      background-attachment: fixed;
+      overflow-x: hidden;
+      padding-bottom: 80px;
+    }
+
+    /* 顶部玻璃导航栏 */
+    .glass-nav {
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      padding: 18px 20px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+
+    .glass-nav h1 {
+      color: #fff;
+      font-size: 18px;
+      font-weight: 600;
+      opacity: 0.95;
+    }
+
+    /* 玻璃卡片通用样式 */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 20px;
+      margin: 16px;
+      padding: 22px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    /* 入场动画 */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 输入框 */
+    .glass-input {
+      width: 100%;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin: 10px 0;
+      color: #fff;
+      font-size: 15px;
+      outline: none;
+    }
+
+    .glass-input::placeholder {
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* 玻璃按钮 */
+    .glass-btn {
+      background: linear-gradient(90deg, #6366f1, #8b5cf6);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 12px 24px;
+      font-size: 15px;
+      font-weight: 500;
+      float: right;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    .glass-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+    }
+
+    .glass-btn:active {
+      transform: translateY(0);
+    }
+
+    .clearfix::after {
+      content: "";
+      clear: both;
+      display: table;
+    }
+
+    /* 动态卡片 */
+    .post-card {
+      color: #fff;
+      opacity: 0.95;
+    }
+
+    .post-user {
+      display: flex;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(90deg, #6366f1, #ec4899);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-right: 12px;
+    }
+
+    .post-content {
+      line-height: 1.6;
+      margin: 16px 0;
+      font-size: 15px;
+    }
+
+    /* 交互栏 */
+    .action-bar {
+      display: flex;
+      gap: 24px;
+      padding: 12px 0;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .action {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .action:hover {
+      color: #fff;
+      transform: scale(1.05);
+    }
+
+    /* 评论区 */
+    .comment-item {
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 13px;
+    }
+
+    .comment-name {
+      color: #a78bfa;
+      font-weight: 500;
+    }
+
+    .comment-input-box {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    /* Toast轻提示 */
+    .toast {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%) translateY(30px);
+      background: rgba(0,0,0,0.7);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      opacity: 0;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* 空状态 */
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: rgba(255,255,255,0.4);
+      font-size: 15px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 顶部导航 -->
+  <div class="glass-nav">
+    <h1>✨ 液态玻璃小圈子</h1>
+  </div>
+
+  <!-- 发布面板 -->
+  <div class="glass-card clearfix">
+    <input class="glass-input" id="nickname" placeholder="你的昵称">
+    <textarea class="glass-input" id="content" rows="3" placeholder="分享你的动态..."></textarea>
+    <button class="glass-btn" onclick="publishPost()">发布动态</button>
+  </div>
+
+  <!-- 动态列表 -->
+  <div id="postList"></div>
+
+  <!-- Toast提示 -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // 全局变量
+    let toastTimer = null;
+
+    // 页面加载
+    window.onload = () => { loadPosts() };
+
+    // Toast提示（替代alert）
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+
+    // 加载动态
+    async function loadPosts() {
+      try {
+        const res = await fetch('/api/posts');
+        const data = await res.json();
+        renderPosts(data.data || []);
+      } catch (e) { showToast('加载失败'); }
+    }
+
+    // 渲染动态
+    function renderPosts(posts) {
+      const list = document.getElementById('postList');
+      if (posts.length === 0) {
+        list.innerHTML = '<div class="empty">暂无动态，快来发布第一条吧～</div>';
+        return;
+      }
+
+      let html = '';
+      posts.forEach(p => {
+        const time = new Date(p.createTime).toLocaleString();
+        let comments = '';
+        p.comments.forEach(c => {
+          comments += `<div class="comment-item"><span class="comment-name">${c.nickname}</span>：${c.content}</div>`;
+        });
+
+        html += `
+        <div class="glass-card post-card">
+          <div class="post-user">
+            <div class="avatar">${p.nickname.charAt(0) || '匿'}</div>
+            <div>
+              <div>${p.nickname}</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.5)">${time}</div>
+            </div>
+          </div>
+          <div class="post-content">${p.content}</div>
+          <div class="action-bar">
+            <div class="action" onclick="like(${p.id})">👍 ${p.like}</div>
+            <div class="action" onclick="view(${p.id})">👀 ${p.view}</div>
+            <div class="action">💬 ${p.comments.length}</div>
+          </div>
+          <div style="margin-top:12px">${comments}</div>
+          <div class="comment-input-box">
+            <input class="glass-input" style="flex:0.3" id="c_nick_${p.id}" placeholder="昵称">
+            <input class="glass-input" style="flex:1" id="c_text_${p.id}" placeholder="发表评论...">
+            <button class="glass-btn" style="padding:10px 16px" onclick="comment(${p.id})">发送</button>
+          </div>
+        </div>`;
+      });
+      list.innerHTML = html;
+    }
+
+    // 发布动态
+    async function publishPost() {
+      const nickname = document.getElementById('nickname').value.trim();
+      const content = document.getElementById('content').value.trim();
+      if (!content) return showToast('请输入内容');
+
+      await fetch('/api/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nickname, content })
+      });
+      showToast('发布成功 ✅');
+      document.getElementById('content').value = '';
+      loadPosts();
+    }
+
+    // 点赞
+    async function like(id) {
+      await fetch(`/api/posts/${id}/like`, { method: 'POST' });
+      loadPosts();
+    }
+
+    // 浏览量
+    async function view(id) {
+      await fetch(`/api/posts/${id}/view`, { method: 'POST' });
+    }
+
+    // 评论
+    async function comment(id) {
+      const nick = document.getElementById(`c_nick_${id}`).value.trim();
+      const text = document.getElementById(`c_text_${id}`).value.trim();
+      if (!text) return showToast('请输入评论');
+
+      await fetch(`/api/posts/${id}/comment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nickname: nick, content: text })
+      });
+      showToast('评论成功');
+      loadPosts();
+    }
+  </script>
+</body>
+</html>
